@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+export DEBIAN_FRONTEND=noninteractive
+
+installpkg(){
+    dpkg-query --status $1 >/dev/null || apt-get install -y $1
+}
+
+add-apt-repository ppa:ondrej/php
+apt-get update
+installpkg zip
+installpkg php7.0
+installpkg php7.0-mbstring
+installpkg php7.0-json
+installpkg php7.0-mysql
+installpkg php7.0-xml
+installpkg php7.0-zip
+#installpkg php7.0-redis
+#installpkg redis-server
+#installpkg supervisor
+installpkg mysql-server
+#installpkg apache2-utils
+#installpkg apache2-suexec-custom
+
+#echo "ServerName localhost" > /etc/apache2/conf-enabled/servername.conf
+#a2enmod suexec
+#a2dissite 000-default.conf
+#cp /tmp/001-talented.conf /etc/apache2/sites-available
+#a2ensite  001-talented.conf
+#service apache2 restart
+
+#cp /tmp/mo.conf /etc/supervisor/conf.d/
+#service supervisor restart
+
+#bootstrapdb(){
+#    cat <<EOF | mysql -uroot
+#    DROP DATABASE IF EXISTS samtt;
+#    CREATE DATABASE samtt;
+#    USE samtt;
+#    CREATE TABLE mo (
+#      id int NOT NULL auto_increment,
+#      msisdn varchar(20),
+#      operatorid int,
+#      shortcodeid int,
+#      text varchar(255),
+#      auth_token varchar(60),
+#      created_at DATETIME,
+#      PRIMARY KEY(id)
+#    ) ;
+#
+#    ALTER TABLE mo ADD INDEX (created_at);
+#
+#EOF
+#}
+#bootstrapdb
+#
+#populate_db() {
+#    #/tmp/populate_db 10000000| mysql -u root samtt
+#
+#    #debug
+#    /tmp/populate_db 100| mysql -u root samtt
+#}
+#populate_db
+
+composer_install() {
+    EXPECTED_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig)
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    ACTUAL_SIGNATURE=$(php -r "echo hash_file('SHA384', 'composer-setup.php');")
+
+    if [ "$EXPECTED_SIGNATURE" != "$ACTUAL_SIGNATURE" ]
+    then
+        >&2 echo 'ERROR: Invalid installer signature'
+        rm composer-setup.php
+        exit 1
+    fi
+
+    php composer-setup.php --quiet
+    RESULT=$?
+    rm composer-setup.php
+#    exit $RESULT
+
+    echo $RESULT;
+}
+composer_install
+
+mv composer.phar /usr/local/bin/composer
+cd /home/vagrant/autotrader
+composer install -vv
+
+#php bin/console server:run 127.0.0.1:8080
