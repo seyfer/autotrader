@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Car list</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Price</th>
+            <th>Year</th>
+            <th>Navigation</th>
+            <th>Description</th>
+            <th>Promoted</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for car in cars %}
+            <tr>
+                <td><a href="{{ path('car_show', { 'id': car.id }) }}">{{ car.id }}</a></td>
+                <td>{{ car.price }}</td>
+                <td>{{ car.year }}</td>
+                <td>{% if car.navigation %}Yes{% else %}No{% endif %}</td>
+                <td>{{ car.description }}</td>
+                <td>
+                    <span class="glyphicon glyphicon-{% if car.promote %}ok-circle{% else %}ban-circle{% endif %}"></span>
+                </td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('car_show', { 'id': car.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('car_edit', { 'id': car.id }) }}">edit</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('car_promote', {'id': car.id}) }}">promote</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('car_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}
